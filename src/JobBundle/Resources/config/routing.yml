@@ -1,0 +1,25 @@
+# @JobBundle/Resources/config/routing.yml
+
+job_insert:
+    path:     /
+    defaults: { _controller: JobBundle:Job:post }
+    methods:  POST
+
+job_show:
+    path:     /{id}
+    defaults: { _controller: JobBundle:Job:id }
+    methods:  [GET, HEAD]
+
+job_update:
+    path:     /{id}
+    defaults: { _controller: JobBundle:Job:update }
+    methods:  POST
+
+job_delete:
+    path:     /{id}
+    defaults: { _controller: JobBundle:Job:delete }
+    methods:  DELETE
+
+job_homepage:
+    path:     /
+    defaults: { _controller: JobBundle:Job:get }
