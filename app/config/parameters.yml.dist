@@ -4,9 +4,9 @@
 parameters:
     database_host: 127.0.0.1
     database_port: 3306
-    database_name: c2Base
-    database_user: c2Bondaruk
-    database_password: AngelGuimer@111
+    database_name: 
+    database_user: 
+    database_password: 
     # You should uncomment this if you want to use pdo_sqlite
     #database_path: '%kernel.project_dir%/var/data/data.sqlite'
     mailer_transport: smtp
