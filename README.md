@@ -32,12 +32,12 @@ Una vez instalado **Composer**, ejecuta los siguientes comandos para descargar e
 
 ```bash
 # clona el código de la aplicación
-$ cd proyectos/
-$ git clone git clone git://github.com/inventabcn/APIs-RESTful-Symfony-3-Javascript.git
+clone git://github.com/inventabcn/APIs-RESTful-Symfony-3-Javascript.git
+cd APIs-RESTful-Symfony-3-Javascript
 
 # instala las dependencias del proyecto (incluyendo Symfony)
-$ cd APIs-RESTful-Symfony-3-Javascript/
-$ composer install
+cd APIs-RESTful-Symfony-3-Javascript/
+composer install
 ```
 
 Personalizar la hoja de ajustes:
