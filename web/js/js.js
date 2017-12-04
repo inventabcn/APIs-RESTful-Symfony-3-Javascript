@@ -1,20 +1,28 @@
-  var apiUrl = 'http://api.descubrebarcelona.com/'
-  var form = document.querySelector('form')
-  var input = document.getElementById('name')
-  var message = document.getElementById('message')
-  var todosList = document.querySelector('.todosList')
-  var todosListSpan = document.getElementById('list_group').getElementsByTagName("span");
+  var apiUrl = 'http://localhost:8000/' // la url de la API
+
+
+  // configuracion de id en html
+  const form = document.querySelector('form')
+  const input = document.getElementById('name')
+  const message = document.getElementById('message')
+  const todosList = document.querySelector('.todosList')
+  const todosListSpan = document.getElementById('list_group').getElementsByTagName("span");
+  let granList = []; // todos los datos
+  var idUpdate; // ultimo id actualizado
+  var idRemove; // ultimo id borrado
+  var MensajeAlertCont = 0; // contador de mensajes
 
   form.addEventListener("submit", create)
-  var granList;
-  var MensajeAlertCont;
 
-  function yaExisteFunction(comprobar, id) {
-    for(x=0; x<granList.length; x++) {
-      if( (granList[x].id != id) && (granList[x].name.length == comprobar.length) && (granList[x].name.indexOf(comprobar) != -1) ) {
-        MensajeAlert('warning','Error: Ya existe ' + comprobar + ' en la lista');
-        delete comprobar;
-        return false;
+  function yaExisteFunction(comprobar, id = 0) {
+    var firstObj = granList.filter(function (name) { return name == comprobar; });
+    if(firstObj.length > 0){
+      for(x=0; x<firstObj.length; x++) {
+        if( (firstObj[x].id != id) && (firstObj[x].name.length == comprobar.length) && (firstObj[x].name.indexOf(comprobar) != -1) ) {
+          MensajeAlert('warning','Error: Ya existe ' + comprobar + ' en la lista');
+          delete comprobar;
+          return false;
+        }
       }
     }
     delete comprobar;
@@ -30,10 +38,12 @@
     delete comprobar;
     return true;
   }
-  function alertSetTimeout(MensajeAlertContId){
-    window.setTimeout(function() {
-       document.getElementById(MensajeAlertContId).remove();
-    }, 5000);
+  function alertSetTimeout(MensajeAlertContId = null){
+    if(MensajeAlertContId != null) {
+      window.setTimeout(function() {
+         document.getElementById(MensajeAlertContId).remove();
+      }, 5000);
+    }
   }
   // info
   // success
@@ -102,7 +112,7 @@
   function create(event){
     event.preventDefault();
     var largo = longitud(input.value);
-    var yaExiste = yaExisteFunction(input.value, 'create');
+    var yaExiste = yaExisteFunction(input.value);
     if( largo === true && yaExiste === true ) {
       fetch(apiUrl,{
         method: 'POST',
@@ -116,7 +126,8 @@
       .then(json)
       .then(li)
       .then(function(data){
-        granList.push(data);
+        granList = granList,data;
+        test();
         input.value = ''
       })
       .catch(function (error) {
@@ -130,35 +141,41 @@
 
   function updateList(event){
     event.preventDefault();
-    var id = event.target.getAttribute("data-id")
-    for(x=0; x<granList.length; x++) {
-      if( granList[x].id == id) {
-        var viejoName = granList[x].name;
-        var puntero = x;
+    idUpdate = event.target.getAttribute("data-id")
+    document.getElementById('texto-'+idUpdate).classList.remove('error-item');
+    var puntero = 0;
+    var viejoName = '';
+    if (undefined !== granList && granList.length) {
+      for (x = 0; x < granList.length; x++) {
+        if( granList[x].id == idUpdate) {
+          viejoName = granList[x].name;
+          puntero = x;
+        }
       }
-    }
-    if(event.target.innerText != viejoName){
-      var largo = longitud(event.target.innerText);
-      var yaExiste = yaExisteFunction(event.target.innerText, id);
-      if( largo === true && yaExiste === true ) {
-        fetch(apiUrl+id,{
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json, text/plain, */*',
-            'Content-type':'application/json'
-          },
-          body: JSON.stringify({name:event.target.innerText})
-        })
-          .then(status)
-          .then(json)
-          .then(function(response){
-            if( granList[puntero].id == id) {
-              granList[puntero].name = response.name;
-            }
+      if(event.target.innerText != viejoName && puntero != 0){
+        var largo = longitud(event.target.innerText);
+        var yaExiste = yaExisteFunction(event.target.innerText, idUpdate);
+        if( largo === true && yaExiste === true ) {
+          fetch(apiUrl+idUpdate,{
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json, text/plain, */*',
+              'Content-type':'application/json'
+            },
+            body: JSON.stringify({name:event.target.innerText})
           })
-      }else{
-        document.getElementById('texto-'+id).innerHTML = granList[puntero].name;
-        document.getElementById('texto-'+id).className += " error-item";
+            .then(status)
+            .then(json)
+            .then(function(response){
+              if( granList[puntero].id == idUpdate) {
+                granList[puntero].name = response.name;
+              }
+              test();
+            })
+        }else{
+          document.getElementById('texto-'+idUpdate).innerHTML = granList[puntero].name;
+          document.getElementById('texto-'+idUpdate).className += " error-item";
+        }
       }
     }
   }
@@ -184,12 +201,18 @@
 
   function removeIdList(event){
     event.preventDefault()
-    var id = event.target.getAttribute("data-id")
-    if(id % 1 == 0 && id != null && id !== "") {
-      fetch(apiUrl+id, {method: 'DELETE'})
+    idRemove = event.target.getAttribute("data-id");
+    if(idRemove % 1 == 0 && idRemove != null && idRemove !== "") {
+      fetch(apiUrl+idRemove, {method: 'DELETE'})
         .then(status)
         .then(function(){
           todosList.removeChild(event.target.parentNode)
+          for(x=0; x<granList.length; x++) {
+            if( granList[x].id == idRemove) {
+              granList.splice(x, 1);
+            }
+          }
+          test();
           MensajeAlert('success','eliminado ok');
         })
         .catch(function(error) {
@@ -206,13 +229,19 @@
       .then(status)
       .then(json)
       .then(function(todosList){
-        granList = todosList;
-        MensajeAlert('info','Items en Total: ' + todosList.length);
         todosList.forEach(li)
+        granList = todosList;
+        test();
+        MensajeAlert('info','Items en Total: ' + todosList.length);
       })
       .catch(function(error) {
         MensajeAlert('warning','Error: ' + error);
       });
+  }
+
+  function test(){
+    // for(x=0; x<granList.length; x++) {console.log('dato:', granList[x].id + ' / ' + granList[x].name + ' / ' + x);
+    // }
   }
 
   function preloader() {
@@ -220,7 +249,6 @@
     document.getElementById('page').style.display = 'block';
   }
    window.onload = function() {
-    MensajeAlertCont = 0;
     preloader();
     listado();
   };
