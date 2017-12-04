@@ -48,13 +48,13 @@ cd APIs-RESTful-Symfony-3-Javascript/
 composer install
 ```
 
-# Personalizar la hoja de ajustes cuando te lo pregunte:
+### Personalizar la hoja de ajustes cuando te lo pregunte:
 
-  database_host (127.0.0.1):
-  database_port (3306):
-  database_name (null): Symfony
-  database_user (null): tu dato
-  database_password (null): tu dato
+	database_host (127.0.0.1):
+	database_port (3306):
+	database_name (null): Symfony
+	database_user (null): tu dato
+	database_password (null): tu dato
 
 Puedes reeditarlos aquí
 
@@ -74,13 +74,13 @@ nano app/config/parameters.yml
 	locale: de
 	secret: xxx
 
-# Instalar la tablas en la base de datos:
+### Instalar la tablas en la base de datos:
 
 ```bash
 php bin/console doctrine:schema:update --force
 ```
 
-# Conectarse a la API:
+### Conectarse a la API:
 
 Edita el documento (linea 1) web/js/js.js con los datos correctos.
 
